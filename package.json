@@ -2,6 +2,7 @@
   "name": "scrumbs-server",
   "description": "Scrumbs application back-end",
   "version": "1.0.0",
+  "repository": "https://github.com/gasparandr/scrumbs-server.git",
   "scripts": {
     "start": "tsc && node ./build/index.js",
     "ts": "tsc -w",
