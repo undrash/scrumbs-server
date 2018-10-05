@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import {IBlocker} from "./interfaces/IBlocker";
 
 
 const BlockerSchema = new Schema({
@@ -44,4 +45,4 @@ const BlockerSchema = new Schema({
 
 });
 
-export default model( "Blocker", BlockerSchema );
+export default model<IBlocker>( "Blocker", BlockerSchema );

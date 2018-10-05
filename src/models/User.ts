@@ -1,6 +1,6 @@
 
 import { Schema, model } from "mongoose";
-import { IUser } from "./IUser";
+import { IUser } from "./interfaces/IUser";
 const bcrypt = require("bcrypt");
 
 const SALT_WORK_FACTOR = 10;

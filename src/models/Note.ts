@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import {INote} from "./interfaces/INote";
 
 
 const NoteSchema = new Schema({
@@ -21,5 +22,5 @@ const NoteSchema = new Schema({
 });
 
 
-export default NoteSchema;
+export default NoteSchema as INote;
 

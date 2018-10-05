@@ -3,7 +3,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 
 import Record from "../models/Record";
-import {IUser} from "../models/IUser";
+import {IUser} from "../models/interfaces/IUser";
 import User from "../models/User";
 import Log from "../models/Log";
 

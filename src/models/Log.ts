@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 import NoteSchema from "./Note";
+import {ILog} from "./interfaces/ILog";
+
 
 const LogSchema = new Schema({
     created: {
@@ -20,4 +22,4 @@ const LogSchema = new Schema({
 });
 
 
-export default model( "Log", LogSchema );
+export default model<ILog>( "Log", LogSchema );

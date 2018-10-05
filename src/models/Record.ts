@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import {IRecord} from "./interfaces/IRecord";
 import Log from "./Log";
 
 
@@ -32,4 +33,4 @@ RecordSchema.virtual( "logCount" ).get( function () {
 });
 
 
-export default model( "Record", RecordSchema );
+export default model<IRecord>( "Record", RecordSchema );
