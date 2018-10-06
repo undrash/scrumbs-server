@@ -1,7 +1,9 @@
 
-import { Schema, model } from "mongoose";
+import {Schema, model, Model} from "mongoose";
 import { IUser } from "./interfaces/IUser";
 const bcrypt = require("bcrypt");
+
+
 
 const SALT_WORK_FACTOR = 10;
 
@@ -115,6 +117,6 @@ UserSchema.pre("save", function(next) {
 
 
 
-const User = model<IUser>( "User", UserSchema );
+const User: Model<IUser> = model<IUser>( "User", UserSchema );
 
 export default User;

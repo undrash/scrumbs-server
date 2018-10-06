@@ -75,7 +75,5 @@ class UserController {
 }
 
 
-const userController: UserController = new UserController();
-userController.routes();
 
-export default userController.router;
+export default new UserController().router;
