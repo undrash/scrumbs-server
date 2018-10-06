@@ -1,6 +1,11 @@
+
+
 import { Schema, model } from "mongoose";
+import { ILog } from "./interfaces/ILog";
 import NoteSchema from "./Note";
-import {ILog} from "./interfaces/ILog";
+
+
+
 
 
 const LogSchema = new Schema({

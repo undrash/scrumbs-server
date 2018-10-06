@@ -1,5 +1,10 @@
+
+
+import { INote } from "./interfaces/INote";
 import { Schema } from "mongoose";
-import {INote} from "./interfaces/INote";
+
+
+
 
 
 const NoteSchema = new Schema({

@@ -3,10 +3,10 @@
 import { Router, Request, Response, NextFunction } from "express";
 import * as mongoose from "mongoose";
 
-import Log from "../models/Log";
-import User from "../models/User";
+import { IRecord } from "../models/interfaces/IRecord";
 import Record from "../models/Record";
-import {IRecord} from "../models/interfaces/IRecord";
+import User from "../models/User";
+import Log from "../models/Log";
 
 
 

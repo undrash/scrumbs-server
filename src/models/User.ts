@@ -1,11 +1,14 @@
 
-import {Schema, model, Model} from "mongoose";
+
+import { Schema, model, Model } from "mongoose";
 import { IUser } from "./interfaces/IUser";
 const bcrypt = require("bcrypt");
 
 
-
 const SALT_WORK_FACTOR = 10;
+
+
+
 
 
 const UserSchema = new Schema({
