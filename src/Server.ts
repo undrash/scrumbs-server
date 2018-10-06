@@ -9,6 +9,7 @@ import * as helmet from "helmet";
 import * as cors from "cors";
 
 import UserController from "./controllers/UserController";
+import DataHelper from "./helpers/DataHelper";
 
 
 
@@ -54,6 +55,7 @@ class Server {
 
         this.app.use( '/', router );
         this.app.use( "/api/v1/users", UserController );
+        this.app.use( "/api/v1/db", DataHelper );
     }
 
 }
