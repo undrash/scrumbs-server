@@ -2,9 +2,9 @@
 
 import { Router, Request, Response, NextFunction } from "express";
 
+import Blocker from "../models/Blocker";
 import Record from "../models/Record";
 import Log from "../models/Log";
-import Blocker from "../models/Blocker";
 
 
 class RecordController {

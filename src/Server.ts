@@ -8,10 +8,11 @@ import * as logger from "morgan";
 import * as helmet from "helmet";
 import * as cors from "cors";
 
+import BlockerController from "./controllers/BlockerController";
 import RecordController from "./controllers/RecordController";
 import UserController from "./controllers/UserController";
-import DataHelper from "./helpers/DataHelper";
 import NoteController from "./controllers/NoteController";
+import DataHelper from "./helpers/DataHelper";
 
 
 
@@ -56,6 +57,7 @@ class Server {
         router = express.Router();
 
         this.app.use( '/', router );
+        this.app.use( "/api/v1/blockers", BlockerController );
         this.app.use( "/api/v1/records", RecordController );
         this.app.use( "/api/v1/users", UserController );
         this.app.use( "/api/v1/notes", NoteController );
@@ -63,5 +65,7 @@ class Server {
     }
 
 }
+
+
 
 export default new Server().app;
