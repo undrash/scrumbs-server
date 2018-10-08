@@ -3,9 +3,7 @@
 import { Router, Request, Response, NextFunction } from "express";
 
 import { IUser } from "../models/interfaces/IUser";
-import Record from "../models/Record";
 import User from "../models/User";
-import Log from "../models/Log";
 
 
 
@@ -22,7 +20,15 @@ class UserController {
     }
 
 
-    public login( req: Request, res: Response, next: NextFunction ) {
+
+    public routes() {
+        this.router.post( "/login", this.login );
+        this.router.post( "/sign-up", this.signUp );
+    }
+
+
+
+    public login(req: Request, res: Response, next: NextFunction) {
 
         console.info( "Login request arrived." );
 
@@ -66,10 +72,23 @@ class UserController {
 
 
 
+    public signUp(req: Request, res: Response, next: NextFunction) {
+        console.info( "SignUp request received" );
 
-    public routes() {
-        this.router.post( "/login", this.login );
+        const { firstName, lastName, email, password } = req.body;
+
+        const user = new User( {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password
+        });
+
+        user.save()
+            .then( () => res.send( { success: true, userId: user._id, message: "User successfully created for " + req.body.email } ) )
+            .catch( next );
     }
+
 
 
 }
