@@ -31,7 +31,8 @@ class NoteController {
     public createNote(req: Request, res: Response, next: NextFunction) {
         console.info( "Add note request arrived." );
 
-        const { recordId, content, userId, isBlocker } = req.body;
+        const { recordId, content, isBlocker } = req.body;
+        const userId = req.app.get( "user" )._id;
 
         const now       = new Date( Date.now( ));
         const year      = now.getUTCFullYear();

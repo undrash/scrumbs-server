@@ -81,21 +81,24 @@ UserSchema.pre( "save", function (next) {
 });
 
 
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-    console.info( "compare password -> candidate: " + candidatePassword );
-    console.info( "compare password -> this.password: " + this.password );
 
-    console.info( "compare password-> this:" );
-    console.info( this );
+UserSchema.methods.comparePassword = function (candidatePassword: string): Promise<boolean> {
 
+    let password = this.password;
 
-    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+    return new Promise((resolve, reject) => {
 
-        if ( err ) return cb(err);
+        bcrypt.compare(candidatePassword, password, (err, success) => {
 
-        cb( null, isMatch );
+            if (err) return reject(err);
+            return resolve(success);
+
+        });
+
     });
+
 };
+
 
 
 UserSchema.pre("save", function(next) {

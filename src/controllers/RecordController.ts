@@ -19,22 +19,18 @@ class RecordController {
 
 
     public routes() {
-        this.router.delete( "/delete", this.deleteRecord );
+        this.router.delete( "/:id", this.deleteRecord );
         this.router.post( "/create", this.createRecord );
         this.router.put( "/edit", this.editRecord );
-        this.router.get( "/:id", this.getRecords );
+        this.router.get( "/", this.getRecords );
     }
 
 
 
     public createRecord(req: Request, res: Response, next: NextFunction) {
-        const { name, owner } = req.body;
+        const { name } = req.body;
+        const owner = req.app.get( "user" )._id;
 
-        console.info( "name" );
-        console.info( name );
-
-        console.info( "owner" );
-        console.info( owner );
 
         const record = new Record({
             name: name,
@@ -50,8 +46,9 @@ class RecordController {
 
     public editRecord(req: Request, res: Response, next: NextFunction) {
         const { recordId, name } = req.body;
+        const userId = req.app.get( "user" )._id;
 
-        Record.findByIdAndUpdate( recordId, { name } )
+        Record.findOneAndUpdate( { _id: recordId, owner: userId }, { name } )
             .then( () => {
                 return Blocker.update( { record: recordId }, { label: name }, { multi: true } );
             })
@@ -63,10 +60,10 @@ class RecordController {
 
     public deleteRecord(req: Request, res: Response, next: NextFunction) {
         const recordId: string = req.params.id;
+        const userId = req.app.get( "user" )._id;
 
-        console.log( "Delete record request arrived for record " + recordId );
 
-        Record.findByIdAndRemove( recordId )
+        Record.findOneAndRemove( { _id: recordId, owner: userId } )
             .then( () => res.send( { success: true, message: "Record successfully deleted." } ) )
             .catch( next );
     }
@@ -74,11 +71,9 @@ class RecordController {
 
 
     public getRecords(req: Request, res: Response, next: NextFunction) {
-        const userId: string = req.params.id;
+        const owner = req.app.get( "user" )._id;
 
-        console.log( "Get records request arrived." );
-
-        Record.find( { owner: userId } )
+        Record.find( { owner } )
             .then( (records) => {
 
                 let promises = [];
@@ -100,12 +95,10 @@ class RecordController {
 
                 Promise.all( promises )
                     .then( () => {
-                        console.log( "userRecords" );
-                        console.log( userRecords );
 
                         res.send( {
                             success: true,
-                            userRecords: userRecords
+                            records: userRecords
                         } );
                     });
 

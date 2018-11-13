@@ -1,4 +1,5 @@
 
+require( "dotenv" ).config();
 
 import * as compression from "compression";
 import * as bodyParser from "body-parser";
@@ -8,6 +9,7 @@ import * as logger from "morgan";
 import * as helmet from "helmet";
 import * as cors from "cors";
 
+import Authentication from "./controllers/AuthenticationController";
 import BlockerController from "./controllers/BlockerController";
 import RecordController from "./controllers/RecordController";
 import UserController from "./controllers/UserController";
@@ -26,6 +28,7 @@ class Server {
         this.app = express();
         this.config();
         this.routes();
+        this.errors();
     }
 
 
@@ -44,8 +47,35 @@ class Server {
         this.app.use( helmet() );
         this.app.use( cors() );
 
-        this.app.use( (err, req, res, next) => {
-            res.status( 422 ).send( { error: err.message } );
+        this.app.use( Authentication.initialize() );
+
+        this.app.all( process.env.API_BASE + "*", (req, res, next) => {
+
+            //TODO: Remove @ release
+            if ( req.path.includes( process.env.API_BASE + "data/populate" ) ) return next();
+            if ( req.path.includes( process.env.API_BASE + "data/drop" ) ) return next();
+
+
+            if ( req.path.includes( process.env.API_BASE + "authentication/login" ) ) return next();
+            if ( req.path.includes( process.env.API_BASE + "authentication/sign-up" ) ) return next();
+
+            return Authentication.authenticate( (err, user, info) => {
+
+                if ( err ) { return next( err ); }
+
+                if ( ! user ) {
+                    if ( info.name === "TokenExpiredError" ) {
+                        return res.status( 401 ).json( { message: "Your token has expired. Please generate a new one!" } );
+                    } else {
+                        return res.status( 401 ).json( { message: info.message } );
+                    }
+                }
+
+                this.app.set( "user", user );
+
+                return next();
+
+            })(req, res, next);
         });
 
     }
@@ -57,11 +87,22 @@ class Server {
         router = express.Router();
 
         this.app.use( '/', router );
+
+        this.app.use( process.env.API_BASE + "authentication/", Authentication.router );
+
         this.app.use( "/api/v1/blockers", BlockerController );
         this.app.use( "/api/v1/records", RecordController );
         this.app.use( "/api/v1/users", UserController );
         this.app.use( "/api/v1/notes", NoteController );
-        this.app.use( "/api/v1/db", DataHelper );
+        this.app.use( "/api/v1/data", DataHelper );
+    }
+
+
+
+    public errors() {
+        this.app.use( (err, req, res, next) => {
+            res.status( 422 ).json( { success: false, message: err.message } );
+        });
     }
 
 }

@@ -24,17 +24,19 @@ class BlockerController {
         this.router.put( "/unsolve/:id", this.unsolveBlocker );
         this.router.put( "/solve/:id", this.solveBlocker );
         this.router.post( "/create", this.createBlocker );
-        this.router.get( "/:id", this.getBlockers );
+        this.router.get( "/", this.getBlockers );
     }
 
 
 
     public createBlocker(req: Request, res: Response, next: NextFunction) {
-        const { userId, content, label } = req.body;
+        const { content, label } = req.body;
+
+        const user = req.app.get( "user" )._id;
 
         const blocker = new Blocker({
             content: content,
-            owner: userId,
+            owner: user,
             label: label
         });
 
@@ -48,9 +50,9 @@ class BlockerController {
 
     public getBlockers(req: Request, res: Response, next: NextFunction) {
 
-        const userId: string = req.params.id;
+        const user = req.app.get( "user" )._id;
 
-        Blocker.find( { owner: userId })
+        Blocker.find( { owner: user })
             .then( (blockers) => {
                 let solved = blockers.filter( (blocker) => {
                     return blocker.solved === true;
@@ -69,12 +71,14 @@ class BlockerController {
 
 
     public solveBlocker(req: Request, res: Response, next: NextFunction) {
-        const blockerId: string = req.params.id;
 
-        Blocker.findById( blockerId )
+        const _id: string = req.params.id;
+        const owner = req.app.get( "user" )._id;
+
+        Blocker.findOne( { _id, owner } )
             .then( (blocker) => {
 
-                if ( ! blocker ) res.send( { success: false, message: "Blocker with id " + blockerId + " was not found in the system!" } );
+                if ( ! blocker ) res.send( { success: false, message: "Blocker with id " + _id + " was not found in the system!" } );
 
 
                 if ( ! blocker.record ) {
@@ -109,12 +113,14 @@ class BlockerController {
 
 
     public unsolveBlocker(req: Request, res: Response, next: NextFunction) {
-        const blockerId: string = req.params.id;
+        const _id: string = req.params.id;
+        const owner = req.app.get( "user" )._id;
 
-        Blocker.findById( blockerId )
+
+        Blocker.findOne( { _id,  owner } )
             .then( (blocker) => {
 
-                if ( ! blocker ) res.send( { success: false, message: "Blocker with id " + blockerId + " was not found in the system!" } );
+                if ( ! blocker ) res.send( { success: false, message: "Blocker with id " + _id + " was not found in the system!" } );
 
                 blocker.solved = false;
 
