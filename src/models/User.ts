@@ -55,6 +55,11 @@ const UserSchema = new Schema({
         }
     },
 
+    confirmed: {
+        type: Boolean,
+        default: false
+    }
+
 });
 
 

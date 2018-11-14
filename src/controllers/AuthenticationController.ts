@@ -7,7 +7,8 @@ import * as moment from "moment";
 import { Strategy, ExtractJwt } from "passport-jwt";
 import { IUser } from "../models/interfaces/IUser";
 import User from "../models/User";
-
+import * as nodemailer from "nodemailer";
+import * as fs from "fs";
 
 
 class AuthenticationController {
@@ -24,6 +25,9 @@ class AuthenticationController {
     public routes() {
         this.router.post( "/login", this.login );
         this.router.post( "/sign-up", this.signUp );
+        this.router.post( "/forgot", this.forgotPassword );
+        this.router.get( "/reset/:token", this.getResetPassword );
+        this.router.post( "/reset/:token", this.postResetPassword );
     }
 
 
@@ -103,6 +107,84 @@ class AuthenticationController {
     };
 
 
+
+    private forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+
+        const { email } = req.body;
+
+        User.findOne( { email } )
+            .then( (user) => {
+
+                
+                if(!user&&email.user){
+
+                }
+
+
+                if ( ! user ) {
+                    res.status( 404 ).json( { success: false, message: `The user associated with the email address ${ email } was not found in our database.` } );
+                    return;
+                }
+
+                const smtpTransport = nodemailer.createTransport({
+                    service: "Gmail",
+                    auth: {
+                        user: "gasparandr@gmail.com",
+                        pass: process.env.GMAILPW,
+                    }
+                });
+
+                const mailOptions = {
+                    to: "akonradtomi@gmail.com",
+                    subject: "Node.js Password Reset",
+                    text: `Aasdasda dasdsa dasdasdas ${ req.headers.host }${ process.env.API_BASE }authentication/reset/${  this.genEmailToken( user ) }`
+                };
+
+                smtpTransport.sendMail( mailOptions, (err) => {
+                    if ( err ) next( err );
+
+                    console.log( "mail sent" );
+
+                    res.status( 200 ).json( { success: true, message: `An e-mail has been sent to ${ user.email } with further instructions.` } );
+                })
+
+            })
+            .catch( next );
+
+
+    };
+
+
+
+    private getResetPassword = async(req: Request, res: Response, next: NextFunction) => {
+        const { token } = req.params;
+
+        console.log( `Reset password token ${ token }` );
+
+        res.sendFile( "reset-password.html",{ root: './templates' } );
+
+
+    };
+
+
+
+    private postResetPassword = async(req: Request, res: Response, next: NextFunction) => {
+        const { token } = req.params;
+
+        const { password, confirm } = req.body;
+
+
+
+        console.log( `Reset password token ${ token }` );
+        console.log( `Reset password is ${ password } and confirm is ${ confirm }`);
+
+        res.sendFile( "reset-password.html",{ root: './templates' } );
+
+
+    };
+
+
+
     private genToken(user: IUser): Object {
 
         let expires = moment().utc().add({ days: 7 }).unix();
@@ -117,6 +199,19 @@ class AuthenticationController {
             expires: moment.unix(expires).format()
         };
 
+
+    }
+
+
+
+    private genEmailToken(user: IUser): string {
+
+        let expires = moment().utc().add({ hours: 1 }).unix();
+
+        return jwt.encode({
+            exp: expires,
+            email: user.email
+        }, process.env.EMAIL_SECRET );
 
     }
 
