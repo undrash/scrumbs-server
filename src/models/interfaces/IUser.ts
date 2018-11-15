@@ -7,5 +7,8 @@ export interface IUser extends Document {
     profileImage: string,
     email: string,
     password: string,
+    resetPasswordToken: string,
+    resetPasswordExpires: Date,
+    confirmed: boolean,
     comparePassword(password): Promise<boolean>
 }

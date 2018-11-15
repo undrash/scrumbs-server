@@ -55,6 +55,10 @@ const UserSchema = new Schema({
         }
     },
 
+    resetPasswordToken: String,
+
+    resetPasswordExpires: Date,
+
     confirmed: {
         type: Boolean,
         default: false
@@ -109,14 +113,14 @@ UserSchema.methods.comparePassword = function (candidatePassword: string): Promi
 UserSchema.pre("save", function(next) {
     const self = (this as any);
 
-    User.findOne( { email : self.email } , "email", function(err, results) {
+    User.findOne( { email : self.email } , "email", function(err, result) {
         if( err ) {
 
             next( err );
 
-        } else if( results ) {
+        } else if( result && result._id.toString() !== self._id.toString() ) {
 
-            console.warn( "results", results );
+            console.warn( "result", result );
             self.invalidate( "email", "email must be unique" );
 
             next( new Error( "email must be unique" ) );

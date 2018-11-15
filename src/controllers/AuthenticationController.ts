@@ -1,14 +1,19 @@
 
 import { Router, Request, Response, NextFunction } from "express";
 
-import * as jwt from "jwt-simple";
-import * as passport from "passport";
-import * as moment from "moment";
 import { Strategy, ExtractJwt } from "passport-jwt";
+
+import * as nodemailer from "nodemailer";
+import * as passport from "passport";
+import * as jwt from "jwt-simple";
+import * as moment from "moment";
+import * as crypto from "crypto";
+import * as async from "async";
+
 import { IUser } from "../models/interfaces/IUser";
 import User from "../models/User";
-import * as nodemailer from "nodemailer";
-import * as fs from "fs";
+
+
 
 
 class AuthenticationController {
@@ -112,19 +117,44 @@ class AuthenticationController {
 
         const { email } = req.body;
 
-        User.findOne( { email } )
-            .then( (user) => {
 
-                
-                if(!user&&email.user){
+        async.waterfall([
+            (done) => {
+                crypto.randomBytes(20, (err, buf) => {
 
-                }
+                    const token = buf.toString( "hex" );
+
+                    console.log( "token: " + token );
 
 
-                if ( ! user ) {
-                    res.status( 404 ).json( { success: false, message: `The user associated with the email address ${ email } was not found in our database.` } );
-                    return;
-                }
+                    done( err, token );
+                });
+            },
+
+            (token, done) => {
+
+
+                User.findOne( { email } )
+                    .then( (user) => {
+                        if ( ! user ) {
+                            res.status( 404 ).json( { success: false, message: `The user associated with the email address ${ email } was not found in our database.` } );
+                            return;
+                        }
+
+                        user.resetPasswordToken     = token;
+                        user.resetPasswordExpires   = moment( new Date( Date.now() ) ).add({ hours: 1 }).toDate(); // Expires in 1 hour
+
+
+                        user.save( (err) => {
+                            done( err, token, user );
+                        });
+
+                    })
+                    .catch( next );
+
+            },
+
+            (token, user) => {
 
                 const smtpTransport = nodemailer.createTransport({
                     service: "Gmail",
@@ -135,22 +165,26 @@ class AuthenticationController {
                 });
 
                 const mailOptions = {
-                    to: "akonradtomi@gmail.com",
+                    to: "andrei@ildiesign.com",
                     subject: "Node.js Password Reset",
-                    text: `Aasdasda dasdsa dasdasdas ${ req.headers.host }${ process.env.API_BASE }authentication/reset/${  this.genEmailToken( user ) }`
+                    text: `Aasdasda dasdsa dasdasdas ${ req.headers.host }${ process.env.API_BASE }authentication/reset/${ token }`
                 };
 
                 smtpTransport.sendMail( mailOptions, (err) => {
-                    if ( err ) next( err );
+
+                    if ( err ) {
+                        next( err );
+                        return;
+                    }
 
                     console.log( "mail sent" );
 
                     res.status( 200 ).json( { success: true, message: `An e-mail has been sent to ${ user.email } with further instructions.` } );
+
                 })
 
-            })
-            .catch( next );
-
+            }
+        ]);
 
     };
 
@@ -174,12 +208,36 @@ class AuthenticationController {
         const { password, confirm } = req.body;
 
 
-
         console.log( `Reset password token ${ token }` );
         console.log( `Reset password is ${ password } and confirm is ${ confirm }`);
 
-        res.sendFile( "reset-password.html",{ root: './templates' } );
+        if ( password !== confirm ) {
+            res.status( 400 ).json( { success: false, message: "Passwords provided to not match." } );
+            return;
+        }
 
+
+        User.findOne( { resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } } )
+            .then( user => {
+
+                if ( ! user ) {
+                    res.status( 400 ).json( { success: false, message: "Password reset token is invalid or has expired." } );
+                    return;
+                }
+
+                user.password               = password;
+                user.resetPasswordToken     = null;
+                user.resetPasswordExpires   = null;
+
+                user.save()
+                    .then( () => {
+
+                            res.status( 200 ).json( { success: true, message: "Your password has been updated, please use your new password to log in." } );
+
+                    })
+                    .catch( next );
+            })
+            .catch( next );
 
     };
 
@@ -190,28 +248,16 @@ class AuthenticationController {
         let expires = moment().utc().add({ days: 7 }).unix();
 
         let token = jwt.encode({
+
             exp: expires,
             email: user.email
+
         }, process.env.JWT_SECRET );
 
         return {
             token: "JWT " + token,
             expires: moment.unix(expires).format()
         };
-
-
-    }
-
-
-
-    private genEmailToken(user: IUser): string {
-
-        let expires = moment().utc().add({ hours: 1 }).unix();
-
-        return jwt.encode({
-            exp: expires,
-            email: user.email
-        }, process.env.EMAIL_SECRET );
 
     }
 
