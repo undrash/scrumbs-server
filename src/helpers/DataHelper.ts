@@ -28,7 +28,7 @@ class DataHelper {
         const andrei: any = new User({
             firstName: "Andrei",
             lastName: "Gaspar",
-            email: "andrei@scrumbs.com",
+            email: "andrei@ildiesign.com",
             password: "andrei123"
 
         });

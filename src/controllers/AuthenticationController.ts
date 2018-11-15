@@ -159,15 +159,15 @@ class AuthenticationController {
                 const smtpTransport = nodemailer.createTransport({
                     service: "Gmail",
                     auth: {
-                        user: "gasparandr@gmail.com",
+                        user: process.env.SUPPORT_EMAIL_ADDRESS,
                         pass: process.env.GMAILPW,
                     }
                 });
 
                 const mailOptions = {
-                    to: "andrei@ildiesign.com",
-                    subject: "Node.js Password Reset",
-                    text: `Aasdasda dasdsa dasdasdas ${ req.headers.host }${ process.env.API_BASE }authentication/reset/${ token }`
+                    to: user.email,
+                    subject: "Scrumbs - password reset",
+                    text: `Hi ${ user.firstName }, \n We received a request to reset your password for your Scrumbs account: ${user.email}.\n Please use the link below to reset your password \n ${ req.headers.host }${ process.env.API_BASE }authentication/reset/${ token }`
                 };
 
                 smtpTransport.sendMail( mailOptions, (err) => {
@@ -232,7 +232,7 @@ class AuthenticationController {
                 user.save()
                     .then( () => {
 
-                            res.status( 200 ).json( { success: true, message: "Your password has been updated, please use your new password to log in." } );
+                            res.status( 200 ).json( { success: true, message: "Your password has been updated, you can use the new password the next time you log in." } );
 
                     })
                     .catch( next );
