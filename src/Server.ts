@@ -37,7 +37,8 @@ class Server {
 
         const MONGO_URI = "mongodb://localhost/scrumbs-ts";
 
-        mongoose.connect( MONGO_URI || process.env.MONGODB_URI );
+        mongoose.set( "useCreateIndex", true );
+        mongoose.connect( MONGO_URI || process.env.MONGODB_URI, { useNewUrlParser: true } );
 
 
         this.app.use( bodyParser.urlencoded( { extended: true } ) );
