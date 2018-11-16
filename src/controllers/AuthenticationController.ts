@@ -82,9 +82,9 @@ class AuthenticationController {
 
     private signUp = async (req: Request, res: Response, next: NextFunction) => {
 
-        const { firstName, lastName, email, password, language } = req.body;
+        const { firstName, lastName, email, password } = req.body;
 
-        if ( ! firstName || ! lastName || ! email || ! password || ! language ) {
+        if ( ! firstName || ! lastName || ! email || ! password ) {
             res.status( 400 ).json( { success: false, message: "Missing parameters at sign up." } );
             return;
         }
@@ -93,8 +93,7 @@ class AuthenticationController {
             firstName,
             lastName,
             email,
-            password,
-            language
+            password
         });
 
         user.save()
@@ -206,10 +205,6 @@ class AuthenticationController {
         const { token } = req.params;
 
         const { password, confirm } = req.body;
-
-
-        console.log( `Reset password token ${ token }` );
-        console.log( `Reset password is ${ password } and confirm is ${ confirm }`);
 
         if ( password !== confirm ) {
             res.status( 400 ).json( { success: false, message: "Passwords provided to not match." } );
