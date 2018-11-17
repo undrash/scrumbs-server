@@ -136,7 +136,7 @@ class AuthenticationController {
                 User.findOne( { email } )
                     .then( (user) => {
                         if ( ! user ) {
-                            res.status( 404 ).json( { success: false, message: `The user associated with the email address ${ email } was not found in our database.` } );
+                            res.status( 404 ).json( { success: false, message: `There is no account associated with this email address.` } );
                             return;
                         }
 
@@ -159,14 +159,16 @@ class AuthenticationController {
                     service: "Gmail",
                     auth: {
                         user: process.env.SUPPORT_EMAIL_ADDRESS,
-                        pass: process.env.GMAILPW,
+                        pass: process.env.SUPPORT_EMAIL_PW,
                     }
                 });
+
+
 
                 const mailOptions = {
                     to: user.email,
                     subject: "Scrumbs - password reset",
-                    text: `Hi ${ user.firstName }, \n We received a request to reset your password for your Scrumbs account: ${user.email}.\n Please use the link below to reset your password \n ${ req.headers.host }${ process.env.API_BASE }authentication/reset/${ token }`
+                    text: `Hi ${ user.firstName },\n\nWe received a request to reset your password for your Scrumbs account: ${ user.email }.\n\nPlease use the link below to reset your password \n\n${ req.headers.host }${ process.env.API_BASE }authentication/reset/${ token }\n\nThanks for using Scrumbs.`
                 };
 
                 smtpTransport.sendMail( mailOptions, (err) => {
@@ -176,9 +178,8 @@ class AuthenticationController {
                         return;
                     }
 
-                    console.log( "mail sent" );
 
-                    res.status( 200 ).json( { success: true, message: `An e-mail has been sent to ${ user.email } with further instructions.` } );
+                    res.status( 200 ).json( { success: true, message: `Success! You will receive detailed instructions on resetting your password to your ${ user.email } address in the shortest time possible.` } );
 
                 })
 
