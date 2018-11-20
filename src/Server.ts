@@ -1,4 +1,5 @@
 
+
 require( "dotenv" ).config();
 
 import * as compression from "compression";
@@ -8,6 +9,7 @@ import * as express from "express";
 import * as logger from "morgan";
 import * as helmet from "helmet";
 import * as cors from "cors";
+import * as ejs from "ejs";
 
 import Authentication from "./controllers/AuthenticationController";
 import BlockerController from "./controllers/BlockerController";
@@ -17,7 +19,7 @@ import NoteController from "./controllers/NoteController";
 import DataHelper from "./helpers/DataHelper";
 
 
-
+const publicPath = __dirname.substr( 0, __dirname.indexOf( "build" ) ) + "public";
 
 
 class Server {
@@ -41,6 +43,11 @@ class Server {
         mongoose.connect( MONGO_URI || process.env.MONGODB_URI, { useNewUrlParser: true } );
 
 
+        this.app.set( "view engine", "ejs" );
+
+        this.app.use( "*/public", express.static( publicPath ) );
+
+
         this.app.use( bodyParser.urlencoded( { extended: true } ) );
         this.app.use( bodyParser.json() );
         this.app.use( logger( "dev" ) );
@@ -50,17 +57,17 @@ class Server {
 
         this.app.use( Authentication.initialize() );
 
+
         this.app.all( process.env.API_BASE + "*", (req, res, next) => {
 
             //TODO: Remove @ release
+
             if ( req.path.includes( process.env.API_BASE + "data/populate" ) ) return next();
             if ( req.path.includes( process.env.API_BASE + "data/drop" ) ) return next();
 
 
-            if ( req.path.includes( process.env.API_BASE + "authentication/login" ) ) return next();
-            if ( req.path.includes( process.env.API_BASE + "authentication/sign-up" ) ) return next();
-            if ( req.path.includes( process.env.API_BASE + "authentication/forgot" ) ) return next();
-            if ( req.path.includes( process.env.API_BASE + "authentication/reset" ) ) return next();
+            if ( req.path.includes( process.env.API_BASE + "authentication/" ) ) return next();
+
 
             return Authentication.authenticate( (err, user, info) => {
 

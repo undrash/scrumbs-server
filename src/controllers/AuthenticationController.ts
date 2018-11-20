@@ -164,12 +164,12 @@ class AuthenticationController {
                 });
 
 
-
                 const mailOptions = {
                     to: user.email,
                     subject: "Scrumbs - password reset",
                     text: `Hi ${ user.firstName },\n\nWe received a request to reset your password for your Scrumbs account: ${ user.email }.\n\nPlease use the link below to reset your password \n\n${ req.headers.host }${ process.env.API_BASE }authentication/reset/${ token }\n\nThanks for using Scrumbs.`
                 };
+
 
                 smtpTransport.sendMail( mailOptions, (err) => {
 
@@ -195,8 +195,7 @@ class AuthenticationController {
 
         console.log( `Reset password token ${ token }` );
 
-        res.sendFile( "reset-password.html",{ root: './templates' } );
-
+        res.render( "reset-password" );
 
     };
 
