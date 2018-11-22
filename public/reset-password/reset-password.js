@@ -2,9 +2,10 @@
 
 
 
-var submit = document.getElementById( "submit" );
-var passwordInput = document.getElementById( "password" );
-var passwordConfirmInput = document.getElementById( "confirm" );
+var submit                  = document.getElementById( "reset-password-submit" );
+var passwordInput           = document.getElementById( "reset-password-password" );
+var passwordConfirmInput    = document.getElementById( "reset-password-confirm" );
+var error                   = document.getElementById( "reset-password-error-text" );
 
 
 submit.addEventListener( "click", function (event) {
@@ -20,8 +21,9 @@ submit.addEventListener( "click", function (event) {
         function (response) {
             console.log( response );
         },
-        function (error) {
-            console.log( error );
+        function (message) {
+            error.innerHTML = message;
+            error.style.opacity = 1;
         }
     )
 
@@ -39,7 +41,7 @@ function httpRequest(method, endpoint, data, success, failure) {
     xhr.setRequestHeader( 'Accept', 'application/json' );
 
 
-    xhr.onload = () => {
+    xhr.onload = function () {
 
         var response = JSON.parse( xhr.responseText );
 

@@ -207,7 +207,7 @@ class AuthenticationController {
         const { password, confirm } = req.body;
 
         if ( password !== confirm ) {
-            res.status( 400 ).json( { success: false, message: "Passwords provided to not match." } );
+            res.status( 400 ).json( { success: false, message: "Passwords provided do not match." } );
             return;
         }
 
