@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "repository": "https://github.com/gasparandr/scrumbs-server.git",
   "scripts": {
-    "start": "tsc && node ./build/index.js",
+    "start": "tsc && node ./build/Index.js",
     "ts": "tsc -w",
-    "server": "nodemon ./build/index.js"
+    "server": "nodemon ./build/Index.js"
   },
   "devDependencies": {
     "@types/async": "^2.0.50",
