@@ -6,7 +6,7 @@ import { Router, Request, Response, NextFunction } from "express";
 
 
 
-class NoteController {
+class TeamController {
 
     router: Router;
 
@@ -30,4 +30,4 @@ class NoteController {
 
 
 
-export default new NoteController().router;
+export default new TeamController().router;

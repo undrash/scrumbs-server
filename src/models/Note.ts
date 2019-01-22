@@ -1,31 +1,44 @@
 
 
 import { INote } from "./interfaces/INote";
-import { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 
 
 
 
 
 const NoteSchema = new Schema({
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+
+    member: {
+        type: Schema.Types.ObjectId,
+        ref: "Member"
+    },
 
     content: {
         type: String,
-        required: [ true, "Note content is required." ],
-        validate: {
-            validator: (text) => text.length <= 2500,
-            message: "Note content cannot be larger than 2500 characters."
-        }
+        required: true
     },
 
-    blocker: {
-        type: Schema.Types.ObjectId,
-        ref: "Blocker",
-        default: null
-    }
+    isBlocker: {
+        type: Boolean,
+        default: false
+    },
 
+    isSolved: {
+        type: Boolean,
+        default: false
+    },
+
+    date: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 
-export default NoteSchema as INote;
-
+export default model<INote>( "Note", NoteSchema );

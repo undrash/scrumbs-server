@@ -1,5 +1,7 @@
 
 
+import InvitationController from "./controllers/InvitationController";
+
 require( "dotenv" ).config();
 
 import * as compression from "compression";
@@ -12,11 +14,10 @@ import * as cors from "cors";
 import * as ejs from "ejs";
 
 import Authentication from "./controllers/AuthenticationController";
-import BlockerController from "./controllers/BlockerController";
-import RecordController from "./controllers/RecordController";
 import UserController from "./controllers/UserController";
-import NoteController from "./controllers/NoteController";
 import DataHelper from "./helpers/DataHelper";
+import MemberController from "./controllers/MemberController";
+import NoteController from "./controllers/NoteController";
 
 
 const publicPath = __dirname.substr( 0, __dirname.indexOf( "build" ) ) + "public";
@@ -98,13 +99,16 @@ class Server {
 
         this.app.use( '/', router );
 
-        this.app.use( process.env.API_BASE + "authentication/", Authentication.router );
+        this.app.use( process.env.API_BASE + "authentication", Authentication.router );
 
-        this.app.use( "/api/v1/blockers", BlockerController );
-        this.app.use( "/api/v1/records", RecordController );
-        this.app.use( "/api/v1/users", UserController );
-        this.app.use( "/api/v1/notes", NoteController );
-        this.app.use( "/api/v1/data", DataHelper );
+
+        this.app.use( process.env.API_BASE + "invitations", InvitationController );
+        this.app.use( process.env.API_BASE + "members", MemberController );
+        this.app.use( process.env.API_BASE + "notes", NoteController );
+        this.app.use( process.env.API_BASE + "users", UserController );
+
+
+        this.app.use( process.env.API_BASE + "data", DataHelper );
     }
 
 

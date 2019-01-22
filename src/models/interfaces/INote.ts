@@ -1,12 +1,16 @@
 
 
-import { Schema } from "mongoose";
+import { Document, Schema } from "mongoose";
 
 
 
 
 
-export interface INote extends Schema {
+export interface INote extends Document {
+    owner: Schema.Types.ObjectId,
+    member: Schema.Types.ObjectId,
     content: string,
-    blocker: Schema.Types.ObjectId
+    isBlocker: boolean,
+    isSolved: boolean,
+    date: Date
 }

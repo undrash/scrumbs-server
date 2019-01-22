@@ -62,9 +62,16 @@ const UserSchema = new Schema({
     confirmed: {
         type: Boolean,
         default: false
+    },
+
+    invitations: {
+        type: [ Schema.Types.ObjectId ],
+        ref: "Invitation",
+        default: []
     }
 
 });
+
 
 
 UserSchema.pre( "save", function (next) {
