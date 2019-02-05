@@ -18,17 +18,21 @@ const MemberSchema = new Schema({
         ref: "User"
     },
 
-    teams: {
-        type: [ Schema.Types.ObjectId ],
-        ref: "Team",
-        required: true
-    },
+    teams: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Team",
+            required: true
+        }
+    ],
 
-    notes: {
-        type: [ Schema.Types.ObjectId ],
-        ref: "Note",
-        default: []
-    }
+    notes: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Note",
+            default: []
+        }
+    ]
 
 });
 

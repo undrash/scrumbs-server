@@ -18,11 +18,13 @@ const TeamSchema = new Schema({
         ref: "User"
     },
 
-    moderators: {
-        type: [ Schema.Types.ObjectId ],
-        ref: "User",
-        default: []
-    },
+    moderators: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            default: []
+        }
+    ],
 
     isDefault: {
         type: Boolean,
