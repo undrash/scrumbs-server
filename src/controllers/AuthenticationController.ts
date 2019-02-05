@@ -12,6 +12,7 @@ import * as async from "async";
 
 import { IUser } from "../models/interfaces/IUser";
 import User from "../models/User";
+import Team from "../models/Team";
 
 
 
@@ -95,8 +96,18 @@ class AuthenticationController {
             password
         });
 
-        user.save()
-            .then( () => res.status( 200 ).json( {
+        const defaultTeam = new Team({
+            name: "Scrum Team",
+            owner: user,
+            isDefault: true
+        });
+
+
+        Promise.all([
+            user.save(),
+            defaultTeam.save()
+        ])
+            .then( () => res.status( 200 ).json({
                 success: true,
                 userData: {
                     user: user._id,
