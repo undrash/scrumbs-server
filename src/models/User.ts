@@ -13,21 +13,12 @@ const SALT_WORK_FACTOR = 10;
 
 const UserSchema = new Schema({
 
-    firstName: {
+    name: {
         type: String,
         required: true,
         validate: {
             validator: (name) => name.length > 1 && name.length <= 30,
-            message: "First name has to to be at least two characters in length, but not longer than 30."
-        }
-    },
-
-    lastName: {
-        type: String,
-        required: true,
-        validate: {
-            validator: (name) => name.length > 1 && name.length <= 30,
-            message: "First name has to to be at least two characters in length, but not longer than 30."
+            message: "Name has to to be at least two characters in length, but not longer than 30."
         }
     },
 

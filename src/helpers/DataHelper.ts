@@ -34,8 +34,7 @@ class DataHelper {
 
         /** USER */
         const andrei = new User({
-            firstName: "Andrei",
-            lastName: "Gaspar",
+            name: "Andrei Gaspar",
             email: "andrei@planeeet.com",
             password: "asd123"
         });

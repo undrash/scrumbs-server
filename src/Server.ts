@@ -1,7 +1,4 @@
 
-
-import InvitationController from "./controllers/InvitationController";
-
 require( "dotenv" ).config();
 
 import * as compression from "compression";
@@ -13,11 +10,13 @@ import * as helmet from "helmet";
 import * as cors from "cors";
 import * as ejs from "ejs";
 
+import InvitationController from "./controllers/InvitationController";
 import Authentication from "./controllers/AuthenticationController";
-import UserController from "./controllers/UserController";
-import DataHelper from "./helpers/DataHelper";
 import MemberController from "./controllers/MemberController";
 import NoteController from "./controllers/NoteController";
+import TeamController from "./controllers/TeamController";
+import UserController from "./controllers/UserController";
+import DataHelper from "./helpers/DataHelper";
 
 
 const publicPath = __dirname.substr( 0, __dirname.indexOf( "build" ) ) + "public";
@@ -106,6 +105,7 @@ class Server {
         this.app.use( process.env.API_BASE + "members", MemberController );
         this.app.use( process.env.API_BASE + "notes", NoteController );
         this.app.use( process.env.API_BASE + "users", UserController );
+        this.app.use( process.env.API_BASE + "teams", TeamController );
 
 
         this.app.use( process.env.API_BASE + "data", DataHelper );

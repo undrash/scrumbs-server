@@ -68,8 +68,8 @@ class AuthenticationController {
                 userData: {
                     user: user._id,
                     email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName },
+                    name: user.name
+                },
                 tokenData: this.genToken( user )
             });
 
@@ -82,16 +82,15 @@ class AuthenticationController {
 
     private signUp = async (req: Request, res: Response, next: NextFunction) => {
 
-        const { firstName, lastName, email, password } = req.body;
+        const { name, email, password } = req.body;
 
-        if ( ! firstName || ! lastName || ! email || ! password ) {
+        if ( ! name || ! email || ! password ) {
             res.status( 400 ).json( { success: false, message: "Missing parameters at sign up." } );
             return;
         }
 
         const user = new User({
-            firstName,
-            lastName,
+            name,
             email,
             password
         });
@@ -102,8 +101,7 @@ class AuthenticationController {
                 userData: {
                     user: user._id,
                     email: user.email,
-                    firstName: user.firstName,
-                    lastName: user.lastName },
+                    name: user.name },
                 tokenData: this.genToken( user )
             }))
             .catch( next );
