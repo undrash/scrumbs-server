@@ -1,14 +1,35 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2015",
-    "outDir": "./build",
-    "sourceMap": true
-  },
-  "include": [
-    "./src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+	"compilerOptions": {
+		"alwaysStrict": true,
+    "declaration": false,
+    "declarationMap": false,
+		"forceConsistentCasingInFileNames": true,
+		"newLine": "lf",
+    "noEmit": false,
+    "noEmitHelpers": false,
+    "noEmitOnError": true,
+    "noErrorTruncation": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+		"removeComments": true,
+		"sourceMap": true,
+		"strict": true,
+		"lib": [
+			"esnext"
+		],
+		"module": "commonjs",
+		"target": "es2015",
+		"types": [
+			"@typeverse/async-patterns",
+			"@typeverse/core",
+			"@types/node"
+		],
+		"outDir": "./build"
+	},
+	"exclude": [
+		"node_modules"
+	],
+	"include": [
+		"src/**/*"
+	]
 }

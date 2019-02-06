@@ -1,30 +1,31 @@
-
-require( "dotenv" ).config();
+import * as dotenv from "dotenv"
 
 import * as compression from "compression";
 import * as bodyParser from "body-parser";
-import * as mongoose from "mongoose";
-import * as express from "express";
-import * as logger from "morgan";
-import * as helmet from "helmet";
 import * as cors from "cors";
 import * as ejs from "ejs";
+import * as express from "express";
+import { Application, NextFunction, Request, Response, Router } from "express";
+import * as helmet from "helmet";
+import * as mongoose from "mongoose";
+import * as logger from "morgan";
 
-import InvitationController from "./controllers/InvitationController";
 import Authentication from "./controllers/AuthenticationController";
+import InvitationController from "./controllers/InvitationController";
 import MemberController from "./controllers/MemberController";
 import NoteController from "./controllers/NoteController";
 import TeamController from "./controllers/TeamController";
 import UserController from "./controllers/UserController";
 import DataHelper from "./helpers/DataHelper";
 
+dotenv.config();
 
 const publicPath = __dirname.substr( 0, __dirname.indexOf( "build" ) ) + "public";
 
 
 class Server {
 
-    public app: express.Application;
+    public app: Application;
 
     constructor() {
         this.app = express();
@@ -58,7 +59,7 @@ class Server {
         this.app.use( Authentication.initialize() );
 
 
-        this.app.all( process.env.API_BASE + "*", (req, res, next) => {
+        this.app.all( process.env.API_BASE + "*", (req: Request, res: Response, next: NextFunction) => {
 
             //TODO: Remove @ release
 
@@ -69,7 +70,7 @@ class Server {
             if ( req.path.includes( process.env.API_BASE + "authentication/" ) ) return next();
 
 
-            return Authentication.authenticate( (err, user, info) => {
+            return Authentication.authenticate( (err: any, user: any, info: any) => {
 
                 if ( err ) { return next( err ); }
 
@@ -93,8 +94,7 @@ class Server {
 
 
     public routes() {
-        let router: express.Router;
-        router = express.Router();
+        let router: Router = Router();
 
         this.app.use( '/', router );
 
@@ -114,7 +114,7 @@ class Server {
 
 
     public errors() {
-        this.app.use( (err, req, res, next) => {
+        this.app.use( (err: any, req: Request, res: Response, next: NextFunction) => {
             res.status( 422 ).json( { success: false, message: err.message } );
         });
     }
