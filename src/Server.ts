@@ -1,14 +1,16 @@
+
 import * as dotenv from "dotenv"
 
 import * as compression from "compression";
 import * as bodyParser from "body-parser";
+import * as mongoose from "mongoose";
+import * as express from "express";
+import * as helmet from "helmet";
+import * as logger from "morgan";
 import * as cors from "cors";
 import * as ejs from "ejs";
-import * as express from "express";
+
 import { Application, NextFunction, Request, Response, Router } from "express";
-import * as helmet from "helmet";
-import * as mongoose from "mongoose";
-import * as logger from "morgan";
 
 import Authentication from "./controllers/AuthenticationController";
 import InvitationController from "./controllers/InvitationController";
