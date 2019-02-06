@@ -17,7 +17,7 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         validate: {
-            validator: (name) => name.length > 1 && name.length <= 30,
+            validator: (name: string) => name.length > 1 && name.length <= 30,
             message: "Name has to to be at least two characters in length, but not longer than 30."
         }
     },
@@ -29,7 +29,7 @@ const UserSchema = new Schema({
         required: true,
         unique: true,
         validate: {
-            validator: (email) => {
+            validator: (email: string) => {
                 let emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
                 return emailRegex.test( email );
             },
@@ -41,7 +41,7 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         validate: {
-            validator: (password) => password.length > 4 && password.length < 75,
+            validator: (password: string) => password.length > 4 && password.length < 75,
             message: "Password must contain 4 or more characters."
         }
     },
@@ -73,11 +73,11 @@ UserSchema.pre( "save", function (next) {
     if ( ! user.isModified("password") ) return next();
 
     /** Generate salt */
-    bcrypt.genSalt( SALT_WORK_FACTOR, (err, salt) => {
+    bcrypt.genSalt( SALT_WORK_FACTOR, (err: any, salt: any) => {
         if ( err ) return next( err );
 
         /** Hash the password with the salt */
-        bcrypt.hash( user.password, salt, (err, hash) => {
+        bcrypt.hash( user.password, salt, (err: any, hash: any) => {
             if ( err ) return next( err );
 
             /** Override clear-text password */
@@ -95,7 +95,7 @@ UserSchema.methods.comparePassword = function (candidatePassword: string): Promi
 
     return new Promise((resolve, reject) => {
 
-        bcrypt.compare(candidatePassword, password, (err, success) => {
+        bcrypt.compare(candidatePassword, password, (err: any, success: any) => {
 
             if (err) return reject(err);
             return resolve(success);

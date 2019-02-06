@@ -45,7 +45,7 @@ class AuthenticationController {
 
 
 
-    public authenticate = (callback) => passport.authenticate("jwt", { session: false, failWithError: true }, callback );
+    public authenticate = (callback: any) => passport.authenticate("jwt", { session: false, failWithError: true }, callback );
 
 
 
@@ -127,7 +127,7 @@ class AuthenticationController {
 
 
         async.waterfall([
-            (done) => {
+            (done: any) => {
                 crypto.randomBytes(20, (err, buf) => {
 
                     const token = buf.toString( "hex" );
@@ -139,7 +139,7 @@ class AuthenticationController {
                 });
             },
 
-            (token, done) => {
+            (token: any, done: any) => {
 
 
                 User.findOne( { email } )
@@ -162,7 +162,7 @@ class AuthenticationController {
 
             },
 
-            (token, user) => {
+            (token: any, user: any) => {
 
                 const smtpTransport = nodemailer.createTransport({
                     service: "Gmail",
@@ -230,8 +230,8 @@ class AuthenticationController {
                 }
 
                 user.password               = password;
-                user.resetPasswordToken     = null;
-                user.resetPasswordExpires   = null;
+                user.resetPasswordToken     = null!;
+                user.resetPasswordExpires   = null!;
 
                 user.save()
                     .then( () => {
@@ -256,7 +256,7 @@ class AuthenticationController {
             exp: expires,
             email: user.email
 
-        }, process.env.JWT_SECRET );
+        }, process.env.JWT_SECRET! );
 
         return {
             token: "JWT " + token,
@@ -275,7 +275,7 @@ class AuthenticationController {
             passReqToCallback: true
         };
 
-        return new Strategy(params, (req, payload: any, done) => {
+        return new Strategy(params, (req: any, payload: any, done: any) => {
             User.findOne({ "email": payload.email }, (err, user) => {
 
                 if ( err ) {
