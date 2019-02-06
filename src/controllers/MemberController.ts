@@ -20,6 +20,7 @@ class MemberController {
 
     public routes() {
         this.router.get( '/', this.getMembers );
+        this.router.get( "/:team", this.getMembersOfTeam );
     }
 
 
@@ -28,7 +29,18 @@ class MemberController {
         const userId = req.app.get( "user" )._id;
 
         Member.find( { owner: userId } )
-            .populate( "teams" )
+            .populate( "teams", "name isDefault _id" )
+            .then( members => res.status( 200 ).json( { success: true, members } ) )
+            .catch( next );
+    }
+
+
+
+    public getMembersOfTeam(req: Request, res: Response, next: NextFunction) {
+        const userId = req.app.get( "user" )._id;
+        const teamId = req.params.team;
+
+        Member.find( { owner: userId, teams: teamId } )
             .then( members => res.status( 200 ).json( { success: true, members } ) )
             .catch( next );
     }
