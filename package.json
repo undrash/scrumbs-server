@@ -25,8 +25,7 @@
     "morgan": "1.9.1",
     "nodemailer": "5.1.1",
     "passport": "0.4.0",
-    "passport-jwt": "4.0.0",
-    "waitless": "0.2.0"
+    "passport-jwt": "4.0.0"
   },
   "devDependencies": {
     "@types/async": "2.4.0",
@@ -45,8 +44,6 @@
     "@types/nodemailer": "4.6.5",
     "@types/passport": "1.0.0",
     "@types/passport-jwt": "3.0.1",
-    "@typeverse/async-patterns": "0.2.0",
-    "@typeverse/core": "0.2.0",
     "typescript": "3.3.1"
   }
 }

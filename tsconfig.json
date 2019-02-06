@@ -20,8 +20,6 @@
 		"module": "commonjs",
 		"target": "es2015",
 		"types": [
-			"@typeverse/async-patterns",
-			"@typeverse/core",
 			"@types/node"
 		],
 		"outDir": "./build"
