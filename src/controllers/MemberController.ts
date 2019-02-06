@@ -20,6 +20,7 @@ class MemberController {
 
     public routes() {
         this.router.get( '/', this.getMembers );
+        this.router.post( '/', this.createMember );
         this.router.get( "/:team", this.getMembersOfTeam );
     }
 
@@ -31,6 +32,34 @@ class MemberController {
         Member.find( { owner: userId } )
             .populate( "teams", "name isDefault _id" )
             .then( members => res.status( 200 ).json( { success: true, members } ) )
+            .catch( next );
+    }
+
+
+
+    public createMember(req: Request, res: Response, next: NextFunction) {
+        const userId            = req.app.get( "user" )._id;
+        const { name, team }    = req.body;
+
+        if ( ! name ) {
+            res.status( 422 ).json( { success: false, message: "Name property is required at member creation." } );
+            return;
+        }
+
+        if ( ! team ) {
+            res.status( 422 ).json( { success: false, message: "Team property is required at member creation." } );
+            return;
+        }
+
+        const member = new Member({
+            name,
+            owner: userId
+        });
+
+        member.teams.push( team );
+
+        member.save()
+            .then( member => res.status( 200 ).json( { success: true, member } ) )
             .catch( next );
     }
 
