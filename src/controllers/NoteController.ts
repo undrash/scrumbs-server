@@ -20,6 +20,7 @@ class NoteController {
 
     public routes() {
         this.router.get( "/:member", this.getNotes );
+        this.router.post( '/', this.createNote );
         this.router.put( "/solve/:id", this.solve );
         this.router.put( "/unsolve/:id", this.unsolve );
     }
@@ -32,6 +33,24 @@ class NoteController {
         Note.find( { member } )
             .sort( { date: -1 } )
             .then( notes => res.status( 200 ).json( { success: true, notes } ) )
+            .catch( next );
+    }
+
+
+
+    public createNote(req: Request, res: Response, next: NextFunction) {
+        const userId                            = req.app.get( "user" )._id;
+        const { member, content, isBlocker }    = req.body;
+
+        const note = new Note({
+            owner: userId,
+            member,
+            content,
+            isBlocker
+        });
+
+        note.save()
+            .then( note => res.status( 200 ).json( { success: true, note } ) )
             .catch( next );
     }
 
@@ -54,7 +73,7 @@ class NoteController {
             .then( note => res.status( 200 ).json( { success: true, note } ) )
             .catch( next );
     }
-    
+
 }
 
 
