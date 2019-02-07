@@ -55,19 +55,78 @@ class DataHelper {
         const noteStephen1 = new Note({
             owner: andrei,
             member: memberStephen,
-            content: "John note 1"
+            content: "Two factor authentication implemented",
+            date: new Date( 2018, 11, 28 )
         });
 
 
         const noteStephen2 = new Note({
             owner: andrei,
             member: memberStephen,
-            content: "John note 2"
+            content: "Added Passport as an authentication middleware, configured strategies for Google, Twitter and LinkeIn. Working on task listing component, made a release to the test environment",
+            date: new Date( 2018, 11, 28 )
+        });
+
+
+        const noteStephen3 = new Note({
+            owner: andrei,
+            member: memberStephen,
+            content: "Need the .json translation files for the localization, it works with mock data",
+            date: new Date( 2018, 11, 29 ),
+            isBlocker: true
+        });
+
+
+        const noteStephen4 = new Note({
+            owner: andrei,
+            member: memberStephen,
+            content: "Working on adding social media authentication",
+            date: new Date( 2018, 11, 29 )
+        });
+
+
+        const noteStephen5 = new Note({
+            owner: andrei,
+            member: memberStephen,
+            content: "Sales team has an urgent feature request, but specs are not clear",
+            date: new Date( 2018, 11, 29 )
+        });
+
+
+        const noteStephen6 = new Note({
+            owner: andrei,
+            member: memberStephen,
+            content: "Released version 2.0.8 to the production environment, ad a meeting with QA about prioritizing bug fixes; Fixed bugs 1405, 1406, 1420 and sent them to QA, continuing with 1411 and 1413",
+            date: new Date( 2018, 11, 29 )
+        });
+
+
+        const noteStephen7 = new Note({
+            owner: andrei,
+            member: memberStephen,
+            content: "Implemented remember me feature on a separate branch, testing it today and merging it back to master",
+            date: new Date( 2018, 11, 29 ),
+            isBlocker: true,
+            isSolved: true
+        });
+
+
+        const noteStephen8 = new Note({
+            owner: andrei,
+            member: memberStephen,
+            content: "Authentication JavaScript implemented",
+            date: new Date( 2018, 11, 29 )
         });
 
         memberStephen.teams.push( team1._id );
         memberStephen.notes.push( noteStephen1._id );
         memberStephen.notes.push( noteStephen2._id );
+        memberStephen.notes.push( noteStephen3._id );
+        memberStephen.notes.push( noteStephen4._id );
+        memberStephen.notes.push( noteStephen5._id );
+        memberStephen.notes.push( noteStephen6._id );
+        memberStephen.notes.push( noteStephen7._id );
+        memberStephen.notes.push( noteStephen8._id );
 
 
         const memberLee = new Member({
@@ -149,21 +208,29 @@ class DataHelper {
             andrei.save(),
             team1.save(),
             team2.save(),
-            memberStephen.save(),
-            noteStephen1.save(),
-            noteStephen2.save(),
-            memberLee.save(),
-            memberVictoria.save(),
-            memberEstelle.save(),
-            memberSteve.save()
+            memberStephen.save()
         ])
             .then( () => Promise.all([
-                        memberGordon.save(),
-                        memberCharles.save(),
-                        memberIsabel.save(),
-                        memberChiki.save(),
-                        memberJocka.save()
+                    noteStephen1.save(),
+                    noteStephen2.save(),
+                    noteStephen3.save(),
+                    noteStephen4.save(),
+                    noteStephen5.save(),
+                    noteStephen6.save(),
+                    noteStephen7.save(),
+                    noteStephen8.save()
                 ]))
+            .then(() => Promise.all([
+                    memberLee.save(),
+                    memberVictoria.save(),
+                    memberEstelle.save(),
+                    memberSteve.save(),
+                    memberGordon.save(),
+                    memberCharles.save(),
+                    memberIsabel.save(),
+                    memberChiki.save(),
+                    memberJocka.save()
+            ]) )
             .then( () => res.send( "Database successfully populated." ) )
             .catch( next );
 
