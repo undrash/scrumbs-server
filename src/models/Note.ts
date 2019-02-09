@@ -24,7 +24,7 @@ const NoteSchema = new Schema({
         required: true
     },
 
-    isBlocker: {
+    isImpediment: {
         type: Boolean,
         default: false
     },

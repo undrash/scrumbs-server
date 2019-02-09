@@ -40,13 +40,13 @@ class NoteController {
 
     public createNote(req: Request, res: Response, next: NextFunction) {
         const userId                            = req.app.get( "user" )._id;
-        const { member, content, isBlocker }    = req.body;
+        const { member, content, isImpediment }    = req.body;
 
         const note = new Note({
             owner: userId,
             member,
             content,
-            isBlocker
+            isImpediment
         });
 
         note.save()
