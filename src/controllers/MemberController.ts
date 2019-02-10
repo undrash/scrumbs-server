@@ -22,7 +22,7 @@ class MemberController {
         this.router.get( '/', this.getMembers );
         this.router.post( '/', this.createMember );
         this.router.get( "/:team", this.getMembersOfTeam );
-        this.router.put( "/add", this.addMemberToTeam)
+        this.router.put( "/add", this.addMemberToTeam );
         this.router.put( "/remove", this.removeMemberFromTeam );
     }
 
