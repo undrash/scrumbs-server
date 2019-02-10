@@ -22,6 +22,8 @@ class MemberController {
         this.router.get( '/', this.getMembers );
         this.router.post( '/', this.createMember );
         this.router.get( "/:team", this.getMembersOfTeam );
+        this.router.put( "/add", this.addMemberToTeam)
+        this.router.put( "/remove", this.removeMemberFromTeam );
     }
 
 
@@ -71,6 +73,50 @@ class MemberController {
 
         Member.find( { owner: userId, teams: teamId } )
             .then( members => res.status( 200 ).json( { success: true, members } ) )
+            .catch( next );
+    }
+
+
+
+    public addMemberToTeam(req: Request, res: Response, next: NextFunction) {
+        const { member, team } = req.body;
+
+        if ( ! member ) {
+            res.status( 422 ).json( { success: false, message: "Member id is required to perform this operation." } );
+            return;
+        }
+
+        if ( ! team ) {
+            res.status( 422 ).json( { success: false, message: "Team id is required to perform this operation." } );
+            return;
+        }
+
+        Member.findByIdAndUpdate( member,
+            { $push: { teams: team } },
+            { "new": true } )
+            .then( member => res.status( 200 ).json( { success: true, member } ) )
+            .catch( next );
+    }
+
+
+
+    public removeMemberFromTeam(req: Request, res: Response, next: NextFunction) {
+        const { member, team } = req.body;
+
+        if ( ! member ) {
+            res.status( 422 ).json( { success: false, message: "Member id is required to perform this operation." } );
+            return;
+        }
+
+        if ( ! team ) {
+            res.status( 422 ).json( { success: false, message: "Team id is required to perform this operation." } );
+            return;
+        }
+
+        Member.findByIdAndUpdate( member,
+            { $pull: { teams: team } },
+            { "new": true } )
+            .then( member => res.status( 200 ).json( { success: true, member } ) )
             .catch( next );
     }
 
