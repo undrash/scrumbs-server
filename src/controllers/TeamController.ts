@@ -81,7 +81,7 @@ class TeamController {
         let removedMembers: string[]    = [];
 
         if ( members ) {
-            const currentMembers    = await Member.find( { teams: { $in: id } } );
+            const currentMembers    = await Member.find( { teams: id } );
             const currentMemberIds  = currentMembers.map( m => (m as any)._id.toString() );
 
             addedMembers            = members.filter( (m: any) => currentMemberIds.indexOf( m ) === -1 );
