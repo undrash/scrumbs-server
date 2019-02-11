@@ -101,8 +101,10 @@ class TeamController {
             ]);
         }
 
-        Team.findByIdAndUpdate( id, { name }, { "new" : true } )
-            .then( team => res.status( 200 ).json( { success: true, team, addedMembers, removedMembers } ) )
+        const team = await Team.findByIdAndUpdate( id, { name }, { "new" : true } );
+
+        Member.find( { _id: { $in: addedMembers } } )
+            .then( added => res.status( 200 ).json( { success: true, team, members: { added, removed: removedMembers } } ) )
             .catch( next );
     };
 
