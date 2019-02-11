@@ -8,7 +8,7 @@ import * as passport from "passport";
 import * as jwt from "jwt-simple";
 import * as moment from "moment";
 import * as crypto from "crypto";
-import { waitless } from 'waitless';
+import { lift } from 'waitless';
 
 import { IUser } from "../models/interfaces/IUser";
 import User from "../models/User";
@@ -139,7 +139,7 @@ class AuthenticationController {
         );
       }
 
-      const saveUserRecord = waitless((user: IUser, token: string): Promise<void> => {
+      const saveUserRecord = lift((user: IUser, token: string): Promise<void> => {
         return new Promise((resolve, reject) => {
           user.resetPasswordToken = token;
           user.resetPasswordExpires = moment(new Date(Date.now()))
@@ -150,7 +150,7 @@ class AuthenticationController {
         });
       });
 
-      const sendUserEmail = waitless((user: IUser, token: string): Promise<void> => {
+      const sendUserEmail = lift((user: IUser, token: string): Promise<void> => {
         return new Promise((resolve, reject) => {
           const smtpTransport = nodemailer.createTransport({
             service: 'Gmail',
@@ -189,7 +189,7 @@ class AuthenticationController {
         })
       });
 
-      const handleUserFound = waitless((saveUserRecordResult: void, sendUserEmailResult: void) => {});
+      const handleUserFound = lift((saveUserRecordResult: void, sendUserEmailResult: void) => {});
 
       function handleUserNotFound() {
         // send immediate 404 error response
@@ -199,7 +199,7 @@ class AuthenticationController {
         });
       }
       
-      const impl = waitless((user: IUser | null) => {
+      const impl = lift((user: IUser | null) => {
         if (user) {
           let token = generateSecurityToken();
           handleUserFound(saveUserRecord(user, token), sendUserEmail(user, token));
