@@ -8,7 +8,7 @@ import * as passport from "passport";
 import * as jwt from "jwt-simple";
 import * as moment from "moment";
 import * as crypto from "crypto";
-import { asError, callbackify, cond, serial, VOID } from 'waitless';
+import { asError, callbackify, cond, pipe, VOID } from 'waitless';
 
 import { IUser } from "../models/interfaces/IUser";
 import User from "../models/User";
@@ -185,7 +185,7 @@ class AuthenticationController {
 
       const emailAddr: string = req.body;
 
-      const iop = serial(
+      const iop = pipe(
         (email: string) => User.findOne({ email }).then((user) => user),
 
         cond(
@@ -200,7 +200,7 @@ class AuthenticationController {
             }),
 
           // user found
-          serial(
+          pipe(
             (user) => Promise.all([user!, generateSecurityToken()]),
 
             ([user, token]) => saveUserRecord(user, token),
