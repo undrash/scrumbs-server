@@ -41,7 +41,7 @@
     "@types/jwt-simple": "0.5.33",
     "@types/mongoose": "5.3.12",
     "@types/morgan": "1.7.35",
-    "@types/node": "10.12.24",
+    "@types/node": "11.9.0",
     "@types/nodemailer": "4.6.5",
     "@types/passport": "1.0.0",
     "@types/passport-jwt": "3.0.1",
