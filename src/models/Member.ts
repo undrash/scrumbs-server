@@ -22,8 +22,7 @@ const MemberSchema = new Schema({
     teams: [
         {
             type: Schema.Types.ObjectId,
-            ref: "Team",
-            required: true
+            ref: "Team"
         }
     ],
 
