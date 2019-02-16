@@ -19,7 +19,9 @@ class NoteController {
 
 
     public routes() {
-        this.router.get( "/:member", this.getNotes );
+        this.router.get( "/member/:id", this.getMemberNotes );
+        this.router.get( "/solved", this.getSolved );
+        this.router.get( "/unsolved", this.getUnsolved );
         this.router.post( '/', this.createNote );
         this.router.put( "/solve/:id", this.solve );
         this.router.put( "/unsolve/:id", this.unsolve );
@@ -27,12 +29,34 @@ class NoteController {
 
 
 
-    public getNotes(req: Request, res: Response, next: NextFunction) {
-        const { member } = req.params;
+    public getMemberNotes(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
 
-        Note.find( { member } )
+        Note.find( { member: id } )
             .sort( { date: -1 } )
             .then( notes => res.status( 200 ).json( { success: true, notes } ) )
+            .catch( next );
+    }
+
+
+
+    public getSolved(req: Request, res: Response, next: NextFunction) {
+        const userId = req.app.get( "user" )._id;
+
+        Note.find( { owner: userId, isImpediment: true, isSolved: true } )
+            .populate( "member", "name _id" )
+            .then( impediments => res.status( 200 ).json( { success: true, impediments } ) )
+            .catch( next );
+    }
+
+
+
+    public getUnsolved(req: Request, res: Response, next: NextFunction) {
+        const userId = req.app.get( "user" )._id;
+
+        Note.find( { owner: userId, isImpediment: true, isSolved: false } )
+            .populate( "member", "name _id" )
+            .then( impediments => res.status( 200 ).json( { success: true, impediments } ) )
             .catch( next );
     }
 
@@ -60,6 +84,7 @@ class NoteController {
         const { id } = req.params;
 
         Note.findByIdAndUpdate( id, { isSolved: true }, { "new" : true } )
+            .populate( "member", "name _id" )
             .then( note => res.status( 200 ).json( { success: true, note } ) )
             .catch( next );
     }
@@ -70,6 +95,7 @@ class NoteController {
         const { id } = req.params;
 
         Note.findByIdAndUpdate( id, { isSolved: false }, { "new" : true } )
+            .populate( "member", "name _id" )
             .then( note => res.status( 200 ).json( { success: true, note } ) )
             .catch( next );
     }
