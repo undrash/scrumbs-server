@@ -23,13 +23,132 @@ class DataHelper {
 
 
     public routes() {
-        this.router.get( "/populate", this.populate );
+        this.router.post( "/populate", this.populate );
+        this.router.get( "/populate", this.poplateQuick );
         this.router.get( "/drop", this.drop );
     }
 
 
 
+    /**
+     * Populate API that accepts a JSON input and populates the database
+     *
+     * EXAMPLE INPUT FORMAT :
+     *
+     * {
+            "data":[
+                {
+                    "user":{
+                        "name":"Andrei Gaspar",
+                        "email":"andrei@scrumbs.com",
+                        "password":"asd123"
+                    },
+                    "teams":[
+                        {
+                            "name":"Scrum Team",
+                            "isDefault":true
+                        },
+                        {
+                            "name":"Avengers",
+                            "isDefault":false
+                        }
+                    ],
+                    "members":[
+                        {
+                            "teams":[
+                                "Scrum Team"
+                            ],
+                            "name":"Stephen Hodges",
+                            "notes":[
+                                {
+                                    "content":"Two factor authentication implemented",
+                                    "date":"11/28/2018",
+                                    "isImpediment":false,
+                                    "isSolved":false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+     *
+     * User accounts should be added to the data array
+     * The account contains a user, teams, and members
+     * Teams can be currently listed on the member as an array of strings containing the team names
+     *
+     * @param {Request} req
+     * @param {Response} res
+     * @param {e.NextFunction} next
+     */
     public populate(req: Request, res: Response, next: NextFunction) {
+
+        const { data } = req.body;
+
+        let promises = [];
+
+        for ( let account of data ) {
+
+            const { user, teams, members } = account;
+
+            const userData = new User( user );
+            promises.push( userData.save() );
+
+            let teamData = [];
+
+            for ( let team of teams ) {
+
+                const t = new Team({
+                    owner: userData._id,
+                    name: team.name,
+                    isDefault: team.isDefault
+                });
+
+                teamData.push( t );
+
+                promises.push( t.save() );
+            }
+
+            for ( let member of members ) {
+
+                const m = new Member({
+                    owner: userData._id,
+                    name: member.name
+                });
+
+                m.teams = teamData.filter( t => member.teams.indexOf( t.name ) !== -1 ).map( t => t._id );
+
+                const notes = member.notes;
+
+                for ( let note of notes ) {
+
+                    const n = new Note({
+                        owner: userData._id,
+                        content: note.content,
+                        date: new Date( note.date ),
+                        isImpediment: note.isImpediment,
+                        isSolved: note.isSolved,
+                        member: m._id
+                    });
+
+                    m.notes.push( n._id );
+
+                    promises.push( n.save() );
+                }
+
+                promises.push( m.save() );
+            }
+        }
+
+
+        Promise.all( promises as any )
+            .then( () => res.send( "Database successfully populated." ) )
+            .catch( next );
+    }
+
+
+
+    public poplateQuick(req: Request, res: Response, next: NextFunction) {
         console.info("Collections populate has been initiated." );
 
         /** USER */
