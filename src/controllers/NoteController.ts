@@ -19,7 +19,7 @@ class NoteController {
 
 
     public routes() {
-        this.router.get( "/member/:id", this.getMemberNotes );
+        this.router.get( "/member/:id&:batch&:limit", this.getMemberNotes );
         this.router.get( "/solved", this.getSolved );
         this.router.get( "/unsolved", this.getUnsolved );
         this.router.post( '/', this.createNote );
@@ -30,10 +30,15 @@ class NoteController {
 
 
     public getMemberNotes(req: Request, res: Response, next: NextFunction) {
-        const { id } = req.params;
+        const id    = req.params.id;
+        const batch = req.params.batch || "0" ;
+        const limit = req.params.limit || "15";
+
 
         Note.find( { member: id } )
             .sort( { date: -1 } )
+            .skip( parseInt( batch ) * parseInt( limit ) )
+            .limit( parseInt( limit ) )
             .then( notes => res.status( 200 ).json( { success: true, notes } ) )
             .catch( next );
     }
