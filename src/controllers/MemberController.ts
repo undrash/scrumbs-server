@@ -1,7 +1,6 @@
 
 
 import { Router, Request, Response, NextFunction } from "express";
-import requireLogin from "../services/RequireLogin";
 import Member from "../models/Member";
 
 
@@ -23,9 +22,9 @@ class MemberController {
         this.router.get( '/', this.getMembers );
         this.router.post( '/', this.createMember );
         this.router.get( "/:team", this.getMembersOfTeam );
-        this.router.put( "/add", requireLogin, this.addMemberToTeam );
-        this.router.put( "/remove", requireLogin, this.removeMemberFromTeam );
-        this.router.put( "/edit", requireLogin, this.editMember );
+        this.router.put( "/add", this.addMemberToTeam );
+        this.router.put( "/remove", this.removeMemberFromTeam );
+        this.router.put( "/edit", this.editMember );
     }
 
 
