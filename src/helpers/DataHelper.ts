@@ -174,6 +174,7 @@ class DataHelper {
         const noteStephen1 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Two factor authentication implemented",
             date: new Date( 2018, 11, 28 )
         });
@@ -182,6 +183,7 @@ class DataHelper {
         const noteStephen2 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Added Passport as an authentication middleware, configured strategies for Google, Twitter and LinkeIn. Working on task listing component, made a release to the test environment",
             date: new Date( 2018, 11, 28 )
         });
@@ -190,6 +192,7 @@ class DataHelper {
         const noteStephen3 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Need the .json translation files for the localization, it works with mock data",
             date: new Date( 2018, 11, 29 ),
             isBlocker: true
@@ -199,6 +202,7 @@ class DataHelper {
         const noteStephen4 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Working on adding social media authentication",
             date: new Date( 2018, 11, 29 )
         });
@@ -207,6 +211,7 @@ class DataHelper {
         const noteStephen5 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Sales team has an urgent feature request, but specs are not clear",
             date: new Date( 2018, 11, 29 )
         });
@@ -215,6 +220,7 @@ class DataHelper {
         const noteStephen6 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Released version 2.0.8 to the production environment, ad a meeting with QA about prioritizing bug fixes; Fixed bugs 1405, 1406, 1420 and sent them to QA, continuing with 1411 and 1413",
             date: new Date( 2018, 11, 29 )
         });
@@ -223,6 +229,7 @@ class DataHelper {
         const noteStephen7 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Implemented remember me feature on a separate branch, testing it today and merging it back to master",
             date: new Date( 2018, 11, 29 ),
             isBlocker: true,
@@ -233,6 +240,7 @@ class DataHelper {
         const noteStephen8 = new Note({
             owner: andrei,
             member: memberStephen,
+            team: team1,
             content: "Authentication JavaScript implemented",
             date: new Date( 2018, 11, 29 )
         });

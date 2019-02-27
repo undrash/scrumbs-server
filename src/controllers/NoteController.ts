@@ -19,7 +19,7 @@ class NoteController {
 
 
     public routes() {
-        this.router.get( "/member/:id&:batch&:limit", this.getMemberNotes );
+        this.router.get( "/member/:id&:team&:batch&:limit", this.getMemberNotes );
         this.router.get( "/solved", this.getSolved );
         this.router.get( "/unsolved", this.getUnsolved );
         this.router.post( '/', this.createNote );
@@ -31,11 +31,15 @@ class NoteController {
 
     public getMemberNotes(req: Request, res: Response, next: NextFunction) {
         const id    = req.params.id;
+        const team  = req.params.team;
         const batch = req.params.batch || "0" ;
         const limit = req.params.limit || "15";
 
+        if ( ! id || ! team ) {
+            return res.status( 422 ).json( { success: false, message: "Please provide a member id and a team id to get the member's notes." } );
+        }
 
-        Note.find( { member: id } )
+        Note.find( { member: id, team } )
             .sort( { date: -1 } )
             .skip( parseInt( batch ) * parseInt( limit ) )
             .limit( parseInt( limit ) )
@@ -68,12 +72,13 @@ class NoteController {
 
 
     public createNote(req: Request, res: Response, next: NextFunction) {
-        const userId                            = req.app.get( "user" )._id;
-        const { member, content, isImpediment }    = req.body;
+        const userId                                    = req.app.get( "user" )._id;
+        const { member, team, content, isImpediment }   = req.body;
 
         const note = new Note({
             owner: userId,
             member,
+            team,
             content,
             isImpediment
         });
