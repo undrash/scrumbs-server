@@ -122,13 +122,16 @@ class DataHelper {
 
                 for ( let note of notes ) {
 
+                    const teamId = teamData.filter( t => note.team === t.name )[0]._id;
+
                     const n = new Note({
                         owner: userData._id,
                         content: note.content,
                         date: new Date( note.date ),
                         isImpediment: note.isImpediment,
                         isSolved: note.isSolved,
-                        member: m._id
+                        member: m._id,
+                        team: teamId
                     });
 
                     m.notes.push( n._id );
