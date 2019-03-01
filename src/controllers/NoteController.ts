@@ -25,6 +25,7 @@ class NoteController {
         this.router.post( '/', this.createNote );
         this.router.put( "/solve/:id", this.solve );
         this.router.put( "/unsolve/:id", this.unsolve );
+        this.router.delete( "/member/:id&:team", this.deleteMemberNotes );
     }
 
 
@@ -107,6 +108,16 @@ class NoteController {
         Note.findByIdAndUpdate( id, { isSolved: false }, { "new" : true } )
             .populate( "member", "name _id" )
             .then( note => res.status( 200 ).json( { success: true, note } ) )
+            .catch( next );
+    }
+
+
+
+    public deleteMemberNotes(req: Request, res: Response, next: NextFunction) {
+        const { id, team } = req.params;
+
+        Note.deleteMany( { member: id, team: team } )
+            .then( () => res.status( 200 ).json( { success: true, message: "Notes deleted." } ) )
             .catch( next );
     }
 
