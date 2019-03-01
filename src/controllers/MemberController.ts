@@ -2,6 +2,7 @@
 
 import { Router, Request, Response, NextFunction } from "express";
 import Member from "../models/Member";
+import Note from "../models/Note";
 
 
 
@@ -25,6 +26,7 @@ class MemberController {
         this.router.put( "/add", this.addMemberToTeam );
         this.router.put( "/remove", this.removeMemberFromTeam );
         this.router.put( "/edit", this.editMember );
+        this.router.delete( "/:id", this.deleteMember );
     }
 
 
@@ -132,6 +134,27 @@ class MemberController {
     }
 
 
+
+    public deleteMember(req: Request, res: Response, next: NextFunction) {
+        const id = req.params.id;
+
+        if ( ! id ) {
+            return res.status( 422 ).json({
+                success: false,
+                message: "Invalid member id provided"
+            });
+        }
+
+        Member.findByIdAndDelete( id )
+            .then( () => {
+                return Note.deleteMany( { member: id } ) as any;
+            })
+            .then( () => res.status( 200 ).json( {
+                success: true,
+                message: "Member deleted with all their associated notes."
+            }))
+            .catch( next );
+    }
 
 }
 
