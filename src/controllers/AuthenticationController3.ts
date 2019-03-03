@@ -128,42 +128,41 @@ class AuthenticationController {
       const iop = pipe(
         (email: string) => User.findOne({ email }).then((user) => user),
   
-        cond(
-          // test user not found or found
-          (user) => !user,
-  
-          // user not found: send immediate 404 error response
-          (user) =>
+        (user) => {
+          if (!user) {
+            // user not found: send immediate 404 error response
             res.status(404).json({
               success: false,
               message: `There is no account associated with this email address.`
-            }),
+            });
+            return VOID;
+          }
   
           // user found
-          pipe(
+          return pipe(
             // generate a security token
-            (user) =>
-              new Promise<TV.Result<[IUser, string]>>((resolve) =>
+            (_: void) =>
+              new Promise<TV.Result<string>>((resolve) =>
                 crypto.randomBytes(20, (err?, buf?) => {
                   const token = buf.toString('hex');
                   console.log('token: ' + token);
-                  resolve(err ? err : [user!, token]);
+                  resolve(err ? err : token);
                 })
               ),
   
             // save security token in user's record & pass token on
-            ([user, token]) =>
-              new Promise<TV.Result<[IUser, string]>>((resolve) => {
+            (token) =>
+              new Promise<TV.Result<string>>((resolve) => {
                 user.resetPasswordToken = token;
                 user.resetPasswordExpires = moment(new Date(Date.now()))
                   .add({ hours: 1 })
                   .toDate(); // Expires in 1 hour
   
-                user.save((err?) => resolve(err ? err : [user, token]));
+                user.save((err?) => resolve(err ? err : token));
               }),
   
             // fire off an email for resetting user's password
-            ([user, token]) =>
+            (token) =>
               new Promise<TV.Result<void>>((resolve) => {
                 const smtpTransport = nodemailer.createTransport({
                   service: 'Gmail',
@@ -200,8 +199,8 @@ class AuthenticationController {
                   return resolve();
                 });
               })
-          )
-        )
+          )(VOID);
+        }
       )(emailAddr);
   
       callbackify(iop, (err?: Nullable<Error>) => {
@@ -209,6 +208,7 @@ class AuthenticationController {
           next();
         }
       });
+
 
     };
 

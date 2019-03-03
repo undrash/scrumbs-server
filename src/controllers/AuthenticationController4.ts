@@ -8,7 +8,7 @@ import * as passport from "passport";
 import * as jwt from "jwt-simple";
 import * as moment from "moment";
 import * as crypto from "crypto";
-import { asError, callbackify, cond, pipe, VOID } from 'waitless';
+import { lift } from 'waitless';
 
 import { IUser } from "../models/interfaces/IUser";
 import User from "../models/User";
@@ -121,94 +121,94 @@ class AuthenticationController {
 
 
 
-    private forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    private forgotPassword = (req: Request, res: Response, next: NextFunction) => {
 
-      const emailAddr: string = req.body;
+      const email = req.body;
 
-      const iop = pipe(
-        (email: string) => User.findOne({ email }).then((user) => user),
-  
-        cond(
-          // test user not found or found
-          (user) => !user,
-  
-          // user not found: send immediate 404 error response
-          (user) =>
-            res.status(404).json({
-              success: false,
-              message: `There is no account associated with this email address.`
-            }),
-  
-          // user found
-          pipe(
-            // generate a security token
-            (user) =>
-              new Promise<TV.Result<[IUser, string]>>((resolve) =>
-                crypto.randomBytes(20, (err?, buf?) => {
-                  const token = buf.toString('hex');
-                  console.log('token: ' + token);
-                  resolve(err ? err : [user!, token]);
-                })
-              ),
-  
-            // save security token in user's record & pass token on
-            ([user, token]) =>
-              new Promise<TV.Result<[IUser, string]>>((resolve) => {
-                user.resetPasswordToken = token;
-                user.resetPasswordExpires = moment(new Date(Date.now()))
-                  .add({ hours: 1 })
-                  .toDate(); // Expires in 1 hour
-  
-                user.save((err?) => resolve(err ? err : [user, token]));
-              }),
-  
-            // fire off an email for resetting user's password
-            ([user, token]) =>
-              new Promise<TV.Result<void>>((resolve) => {
-                const smtpTransport = nodemailer.createTransport({
-                  service: 'Gmail',
-                  auth: {
-                    user: process.env.SUPPORT_EMAIL_ADDRESS,
-                    pass: process.env.SUPPORT_EMAIL_PW
-                  }
-                });
-  
-                const mailOptions = {
-                  to: user.email,
-                  subject: 'Scrumbs - password reset',
-                  text: `Hi ${
-                    user.name
-                  },\n\nWe received a request to reset your password for your Scrumbs account: ${
-                    user.email
-                  }.\n\nPlease use the link below to reset your password \n\n${req.headers.host}${
-                    process.env.API_BASE
-                  }authentication/reset/${token}\n\nThanks for using Scrumbs.`
-                };
-  
-                smtpTransport.sendMail(mailOptions, (err?) => {
-                  if (err) {
-                    return resolve(err);
-                  }
-  
-                  res.status(200).json({
-                    success: true,
-                    message: `Success! You will receive detailed instructions on resetting your password to your ${
-                      user.email
-                    } address in the shortest time possible.`
-                  });
-  
-                  return resolve();
-                });
-              })
-          )
-        )
-      )(emailAddr);
-  
-      callbackify(iop, (err?: Nullable<Error>) => {
-        if (err) {
-          next();
-        }
+      function findUser(email: string): Promise<IUser | null> {
+        return User.findOne({ email }).then((user) => user);
+      }
+
+      function generateSecurityToken(): Promise<string> {
+        return new Promise((resolve, reject) =>
+          crypto.randomBytes(20, (err?, buf?) => {
+            const token = buf.toString('hex');
+            console.log('token: ' + token);
+            err ? reject(err) : resolve(token);
+          })
+        );
+      }
+
+      const saveUserRecord = lift((user: IUser, token: string): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          user.resetPasswordToken = token;
+          user.resetPasswordExpires = moment(new Date(Date.now()))
+            .add({ hours: 1 })
+            .toDate(); // Expires in 1 hour
+
+          user.save((err?) => err ? reject(err) : resolve());
+        });
       });
+
+      const sendUserEmail = lift((user: IUser, token: string): Promise<void> => {
+        return new Promise((resolve, reject) => {
+          const smtpTransport = nodemailer.createTransport({
+            service: 'Gmail',
+            auth: {
+              user: process.env.SUPPORT_EMAIL_ADDRESS,
+              pass: process.env.SUPPORT_EMAIL_PW
+            }
+          });
+
+          const mailOptions = {
+            to: user.email,
+            subject: 'Scrumbs - password reset',
+            text: `Hi ${
+              user.name
+            },\n\nWe received a request to reset your password for your Scrumbs account: ${
+              user.email
+            }.\n\nPlease use the link below to reset your password \n\n${req.headers.host}${
+              process.env.API_BASE
+            }authentication/reset/${token}\n\nThanks for using Scrumbs.`
+          };
+
+          smtpTransport.sendMail(mailOptions, (err?) => {
+            if (err) {
+              return reject(err);
+            }
+
+            res.status(200).json({
+              success: true,
+              message: `Success! You will receive detailed instructions on resetting your password to your ${
+                user.email
+              } address in the shortest time possible.`
+            });
+
+            return resolve();
+          });
+        })
+      });
+
+      const handleUserFound = lift((saveUserRecordResult: void, sendUserEmailResult: void) => {});
+
+      function handleUserNotFound() {
+        // send immediate 404 error response
+        res.status(404).json({
+          success: false,
+          message: `There is no account associated with this email address.`
+        });
+      }
+      
+      const impl = lift((user: IUser | null) => {
+        if (user) {
+          let token = generateSecurityToken();
+          handleUserFound(saveUserRecord(user, token), sendUserEmail(user, token));
+        }
+        
+        return handleUserNotFound();
+      });
+
+      return impl(findUser(email)).catch(next);
 
     };
 
